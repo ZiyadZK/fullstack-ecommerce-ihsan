@@ -292,10 +292,10 @@ function MainPage({ children }) {
                         />
                     </div>
                     <div className="flex flex-row-reverse items-center gap-5">
-                        {user.status !== 'fetched' && (
+                        {user.status === 'loading' && (
                             <CircularProgress size={20} />
                         )}
-                        {user.status === 'fetched' && (
+                        {(user.status === 'fetched' || user.status === 'no_token') && (
                             <>
                                 {user.data ? (
                                     <>

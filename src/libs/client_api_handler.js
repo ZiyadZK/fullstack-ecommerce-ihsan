@@ -1,17 +1,14 @@
-'use server'
+'use client'
 
 import axios, { AxiosError, isAxiosError } from "axios"
+import { api_url } from "./api_handler"
 
-export const api_url = async () => {
-    return process.env.API_URL
-}
-
-export const api_get = async ({
-    base_url = `${process.env.API_URL}`,
+export const client_api_get = async ({
     url = '/',
     headers
 }) => {
     try {
+        const base_url = await api_url()
         const response = await axios.get(`${base_url}${url}`, {
             headers
         })
@@ -28,8 +25,7 @@ export const api_get = async ({
     }
 }
 
-export const api_post = async ({
-    base_url = `${process.env.API_URL}`,
+export const client_api_post = async ({
     payload,
     url = '/',
     headers = {
@@ -37,6 +33,7 @@ export const api_post = async ({
     }
 }) => {
     try {
+        const base_url = await api_url()
         const response = await axios.post(`${base_url}${url}`, payload, {
             headers: {
                 ...headers
@@ -56,13 +53,13 @@ export const api_post = async ({
     }
 }
 
-export const api_put = async ({
-    base_url = `${process.env.API_URL}`,
+export const client_api_put = async ({
     payload,
     url = '/',
     headers
 }) => {
     try {
+        const base_url = await api_url()
         const response = await axios.put(`${base_url}${url}`, payload, {
             headers
         })
@@ -79,13 +76,13 @@ export const api_put = async ({
     }
 }
 
-export const api_delete = async ({
-    base_url = `${process.env.API_URL}`,
+export const client_api_delete = async ({
     payload,
     url = '/',
     headers
 }) => {
     try {
+        const base_url = await api_url()
         const response = await axios({
             method: 'DELETE',
             url: base_url + url,
@@ -105,15 +102,15 @@ export const api_delete = async ({
     }
 }
 
-export const api_post_form = async ({
-    base_url = `${process.env.API_URL}`,
+export const client_api_post_form = async ({
     payload,
     url = '/',
     headers = {}
 }) => {
     try {
+        const base_url = await api_url()
         // Make sure headers are properly set for the form data (no need to manually set Content-Type)
-        const response = await axios.post(`${base_url}${url}`, payload, {
+        const response = await axios.postForm(`${base_url}${url}`, payload, {
             headers: {
                 ...headers
             }
@@ -124,30 +121,20 @@ export const api_post_form = async ({
             ...response.data
         };
     } catch (error) {
-        console.log(error)
-        if(error instanceof Error) {
-            return {
-                success: false,
-                message: error?.message,
-                debug: error?.stack
-            }
-        }else if(isAxiosError(error)) {
-            return {
-                success: false,
-                message: error.response.data.data.message,
-                debug: error
-            }
+        return {
+            success: false,
+            ...error.response.data
         }
     }
 };
 
-export const api_put_form = async ({
-    base_url = `${process.env.API_URL}`,
+export const client_api_put_form = async ({
     payload,
     url = '/',
     headers
 }) => {
     try {
+        const base_url = await api_url()
         const response = await axios.putForm(`${base_url}${url}`, payload, {
             headers
         })
@@ -157,6 +144,7 @@ export const api_put_form = async ({
             ...response.data   
         }
     } catch (error) {
+        console.log(error)
         return {
             success: false,
             ...error.response.data

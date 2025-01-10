@@ -4,6 +4,7 @@ import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { CircularProgress, IconButton } from '@mui/material';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -27,16 +28,18 @@ export default function FileUploadComponent({
     onChange = (event) => console.log(event.target.files), // Handle file change events
     buttonProps = {}, // Additional props for the button
     inputProps = {}, // Additional props for the input
+    loading = false
   }) {
-    return (
+    return text !== '' ? (
       <Button
         fullWidth={fullWidth}
         component="label"
         variant={variant}
-        startIcon={startIcon}
+        disabled={loading}
+        startIcon={loading ? <CircularProgress size={15} className='grayscale' /> : startIcon}
         {...buttonProps} // Spread additional button props
       >
-        {text}
+        {loading ? 'Loading' : text}
         <VisuallyHiddenInput
           type="file"
           accept={accept.length < 1 ? '*' : accept.join(',')}
@@ -45,5 +48,16 @@ export default function FileUploadComponent({
           {...inputProps} // Spread additional input props
         />
       </Button>
-    );
+    ):(
+      <IconButton disabled={loading} component="label">
+        {loading ? <CircularProgress size={15} className='grayscale' /> : <CloudUploadIcon color='primary' />}
+        <VisuallyHiddenInput
+          type="file"
+          accept={accept.length < 1 ? '*' : accept.join(',')}
+          multiple={multiple}
+          onChange={onChange}
+          {...inputProps} // Spread additional input props
+        />
+      </IconButton>
+    )
   }

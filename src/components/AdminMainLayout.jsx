@@ -2,7 +2,7 @@
 
 import { poppins } from "@/libs/fonts"
 import { UserContext, UserProvider } from "@/provider/userProvider"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { Logo } from "./Logo"
 import { Avatar, CircularProgress } from "@mui/material"
 import { ArrowBackIos, ArrowLeft, Close, Logout } from "@mui/icons-material"
@@ -35,7 +35,7 @@ function MainPage({ children }) {
         logout: async () => {
             try {
                 cookie_server_delete('api_token')
-                user_dispatch({ type: 'NO_API_TOKEN' })       
+                user_dispatch({ type: 'NO_API_TOKEN' })  
             } catch (error) {
                 customToast.error({
                     message: error?.message
@@ -44,7 +44,11 @@ function MainPage({ children }) {
         }
     }
 
-    
+    useEffect(() => {
+        if(user.status === 'no_token') {
+            router.push('/')
+        }
+    }, [user])
 
     return user.status === 'fetched' 
     ? user.data.role === 'admin' 
@@ -97,9 +101,14 @@ function MainPage({ children }) {
                                         Akun
                                     </div>
                                 </button>
+                                <button type="button" onClick={() => router.push('/dashboard/kategori')} className={`pl-5 block border-l-2 ${pathname === '/dashboard/kategori' ? 'border-blue-500' : 'hover:border-zinc-700'} py-1 text-sm group  ease-out duration-100`}>
+                                    <div className={`${pathname === '/dashboard/kategori' ? 'text-blue-500' : 'group-hover:opacity-100 opacity-50'} ease-out duration-100`}>
+                                        Kategori Produk
+                                    </div>
+                                </button>
                                 <button type="button" onClick={() => router.push('/dashboard/produk')} className={`pl-5 block border-l-2 ${pathname === '/dashboard/produk' ? 'border-blue-500' : 'hover:border-zinc-700'} py-1 text-sm group  ease-out duration-100`}>
                                     <div className={`${pathname === '/dashboard/produk' ? 'text-blue-500' : 'group-hover:opacity-100 opacity-50'} ease-out duration-100`}>
-                                        Produk
+                                        Daftar Produk
                                     </div>
                                 </button>
                                 <button type="button" onClick={() => router.push('/dashboard/kupon')} className={`pl-5 block border-l-2 ${pathname === '/dashboard/kupon' ? 'border-blue-500' : 'hover:border-zinc-700'} py-1 text-sm group  ease-out duration-100`}>

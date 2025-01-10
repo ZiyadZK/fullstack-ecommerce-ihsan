@@ -1,6 +1,7 @@
 import { api_get } from "@/libs/api_handler"
 import { cookie_server_get, cookie_server_has, cookie_server_set } from "@/libs/cookie_server"
 import { customToast } from "@/libs/customToast"
+import { usePathname } from "next/navigation"
 import { createContext, useEffect, useReducer } from "react"
 
 const initialState = {
@@ -21,7 +22,7 @@ const userReducer = (state, action) => {
     case 'FETCH_LOADING':
       return { ...state, status: 'loading' }
     case 'NO_API_TOKEN':
-      return { ...state, status: 'fetched', error: '', data: null }
+      return { ...state, status: 'no_token', error: '', data: null }
     default:
       return state
   }
@@ -30,14 +31,16 @@ const userReducer = (state, action) => {
 export const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
+  const pathname = usePathname()
+  
   const [state, dispatch] = useReducer(userReducer, initialState)
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = cookie_server_get('api_token')
+        dispatch({ type: 'FETCH_LOADING' })
         if(token) {
-          dispatch({ type: 'FETCH_LOADING' })
           const response = await api_get({
             url: '/api/auth/verify',
             headers: {
@@ -47,6 +50,7 @@ export const UserProvider = ({ children }) => {
   
           if(!response.success) {
             dispatch({ type: 'FETCH_SUCCESS', payload: null})
+            
             customToast.failed({
               message: response?.message
             })

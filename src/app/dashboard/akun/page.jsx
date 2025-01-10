@@ -27,15 +27,6 @@ export default function DashboardAkunPage() {
         }
     })
 
-    const [modalList, showModalList] = useState({
-        info: {
-
-        },
-        edit: {
-
-        }
-    })
-
     const [formData, setFormData] = useState({
         tambah: {
             nama: '',

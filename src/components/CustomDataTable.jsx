@@ -80,6 +80,7 @@ function CustomNoRowsOverlay() {
 }
 
 const DataTable = ({
+  id = 'data-table',
   rows = [],
   columns = defaultColumns,
   sx = { border: 0, height: 400, width: '100%' },
@@ -118,7 +119,10 @@ const DataTable = ({
   return (
     <Paper sx={{
       ...sx
-    }}>
+    }}
+
+    
+    >
       {searchable && (
         <div className="p-2">
           <div className="w-1/3">
@@ -144,6 +148,7 @@ const DataTable = ({
         </div>
       )}
       <DataGrid
+        
         rows={filteredRows}
         columns={columns}
         pageSize={computedPageSize}
@@ -189,8 +194,9 @@ const DataTable = ({
         autosizeOptions={{
           columns: [rows.length > 0 && Object.keys(rows[0])],
           includeOutliers: true,
-          includeHeaders: false,
+          includeHeaders: true,
         }}
+        
         onRowSelectionModelChange={rowSelect.onChange}
         rowSelectionModel={rowSelect.value}
         PopperProps={{

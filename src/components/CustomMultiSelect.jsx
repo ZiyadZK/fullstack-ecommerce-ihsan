@@ -1,8 +1,9 @@
 'use client'
 
-import { Autocomplete, TextField } from "@mui/material"
+import { Autocomplete, Popper, TextField } from "@mui/material"
+import { styled } from "@mui/system";
 
-export default function CustomSelect({
+export default function CustomMultiSelect({
     options = [],
     optionLabel = '',
     defaultValue,
@@ -14,16 +15,18 @@ export default function CustomSelect({
     onModal = ""
 }) {
     return (
-        <Autocomplete
+        <Autocomplete 
+            multiple
             fullWidth
+            
             id="tags-standard"
             options={options}
             getOptionLabel={(option) => optionLabel !== ''
                 ? option[optionLabel]
-                : Object.keys(option[0])[0]
+                : Object.keys(options)[0]
             }
             defaultValue={defaultValue}
-            value={value}
+            value={value || [value]}
             filterSelectedOptions
             onChange={onChange}
             slotProps={{

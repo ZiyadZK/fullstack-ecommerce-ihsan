@@ -68,9 +68,10 @@ const Produk = db.define('Produk', {
     ...db_column('stok').int().default(1).build(),
     ...db_column('satuan').str().notNull().default('botol').build(),
     ...db_column('harga_per_satuan').float().default(1.0).build(),
-    ...db_column('fk_foto_produk').int().notNull().ref('Foto_Produk').build(),
+    ...db_column('fk_foto_produk').int().null().ref('Foto_Produk').build(),
     ...db_column('created_at').str().notNull().build(),
     ...db_column('updated_at').str().notNull().build(),
+    ...db_column('deleted_at').str().null().build(),
 },
     db_model_options()
         .tableName('Produk')
@@ -230,7 +231,7 @@ Alamat_Penerima.belongsTo(User, {
 Foto_Produk.hasOne(Produk, {
     foreignKey: 'fk_foto_produk',
     sourceKey: 'id',
-    onDelete: 'CASCADE'
+    onDelete: 'SET NULL'
 })
 
 Produk.belongsTo(Foto_Produk, {
@@ -355,6 +356,11 @@ Checkout.belongsTo(Kupon, {
 
 export { 
     Foto_Profil,
-    User
-
+    User,
+    Kategori,
+    Kategori_Produk,
+    Produk,
+    Foto_Produk,
+    Supplier,
+    Riwayat_Supplier
 }

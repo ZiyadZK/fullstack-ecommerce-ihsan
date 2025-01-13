@@ -3,7 +3,7 @@
 import { lexend, poppins } from "@/libs/fonts"
 import { Logo } from "./Logo"
 import DropdownMenu from "./DropdownMenu"
-import { use, useContext, useEffect, useState } from "react";
+import { Suspense, use, useContext, useEffect, useState } from "react";
 import { Avatar, Badge, Button, Checkbox, CircularProgress, IconButton, InputAdornment, TextField } from "@mui/material";
 import { Close, FavoriteBorderOutlined, Key, Label, Lock, Logout, People, Person, Search, ShoppingCartOutlined, Visibility, VisibilityOff, WorkspacePremiumOutlined } from "@mui/icons-material";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -293,33 +293,35 @@ function MainPage({ children }) {
                 {/* Navbar */}
                 <nav className="p-5 flex justify-between items-center">
                     <Logo className="w-16 h-16" href="/" />
-                    <form onSubmit={e => aksi.produk.search(e)} className="w-1/3">
-                        <TextField
-                            fullWidth 
-                            size="small"
-                            value={form.search}
-                            onChange={e => aksi.form.set('search', e.target.value)}
-                            placeholder="Cari produk anda disini"
-                            className="placeholder:font-bold bg-zinc-100"
-                            slotProps={{
-                                input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Search />
-                                        </InputAdornment>
-                                    ),
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton onClick={() => window.location.href=`/search`}>
-                                                <Close />
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                    
-                                }
-                            }}
-                        />
-                    </form>
+                    <Suspense fallback={<CircularProgress size={20} />}>
+                        <form onSubmit={e => aksi.produk.search(e)} className="w-1/3">
+                            <TextField
+                                fullWidth 
+                                size="small"
+                                value={form.search}
+                                onChange={e => aksi.form.set('search', e.target.value)}
+                                placeholder="Cari produk anda disini"
+                                className="placeholder:font-bold bg-zinc-100"
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Search />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={() => window.location.href=`/search`}>
+                                                    <Close />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                        
+                                    }
+                                }}
+                            />
+                        </form>
+                    </Suspense>
                     <div className="flex flex-row-reverse items-center gap-5">
                         {user.status === 'loading' && (
                             <CircularProgress size={20} />

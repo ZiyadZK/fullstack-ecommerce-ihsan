@@ -8,11 +8,11 @@ import { Apps, ChevronRight, HomeOutlined, House, Search } from "@mui/icons-mate
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 export default function SearchPage() {
 
-    const searchParams = useSearchParams()
+    const searchParams = use(useSearchParams())
     const router = useRouter()
 
     const search = searchParams.get('search')

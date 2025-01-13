@@ -13,10 +13,10 @@ const CustomAccordion = ({
     expandIcon = <ExpandMoreIcon />,
     title,
     children = <div className="">Isi dari Accordion</div>,
-    key = ''
+    keyMap = ''
 }) => {
     return (
-        <Accordion key={key} defaultExpanded={defaultOpen}>
+        <Accordion  defaultExpanded={defaultOpen}>
             <AccordionSummary
                 expandIcon={expandIcon}
                 aria-controls="panel1-content"

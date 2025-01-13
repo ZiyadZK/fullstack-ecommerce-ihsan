@@ -1,26 +1,28 @@
 import { Foto_Produk, Produk } from "@/database/tables";
 import { error_handler } from "@/libs/api/error_handler";
 import { response_handler } from "@/libs/api/response_handler";
-import dayjs from "dayjs";
 import { Op } from "sequelize";
 
 export async function GET(req) {
     try {
+        const searchParams = req.nextUrl.searchParams
 
-        const start_of_week = dayjs().startOf("week").toDate()
-        const end_of_week = dayjs().endOf("week").toDate()
-        const data = await Produk.findAll({
+        const options = {
             where: {
-                created_at: {
-                    [Op.between]: [
-                        start_of_week,
-                        end_of_week
-                    ]
+
+            }
+        }
+
+        if(searchParams.get('search')) {
+            options.where = {
+                nama: {
+                    [Op.substring]: searchParams.get('search')
                 }
-            },
-            order: [
-                ['created_at', 'DESC']
-            ],
+            }
+        }
+
+        const data = await Produk.findAll({
+            ...options,
             include: [
                 {
                     model: Foto_Produk
@@ -31,6 +33,7 @@ export async function GET(req) {
         return response_handler({
             data
         })
+
     } catch (error) {
         return error_handler(error)
     }

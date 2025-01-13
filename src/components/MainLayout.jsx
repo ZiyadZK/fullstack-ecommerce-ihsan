@@ -5,8 +5,8 @@ import { Logo } from "./Logo"
 import DropdownMenu from "./DropdownMenu"
 import { useContext, useEffect, useState } from "react";
 import { Avatar, Badge, Button, Checkbox, CircularProgress, IconButton, InputAdornment, TextField } from "@mui/material";
-import { FavoriteBorderOutlined, Key, Label, Lock, Logout, People, Person, Search, ShoppingCartOutlined, Visibility, VisibilityOff, WorkspacePremiumOutlined } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
+import { Close, FavoriteBorderOutlined, Key, Label, Lock, Logout, People, Person, Search, ShoppingCartOutlined, Visibility, VisibilityOff, WorkspacePremiumOutlined } from "@mui/icons-material";
+import { useRouter, useSearchParams } from "next/navigation";
 import Modal, { modal } from "./Modal";
 import { UserContext, UserProvider } from "@/provider/userProvider";
 import { customToast } from "@/libs/customToast";
@@ -20,7 +20,9 @@ export default function MainLayout({ children, search_field = true, user_utiliti
     return (
         <UserProvider>
             <MainPage>
-                {children}
+                <UserProvider>
+                    {children}
+                </UserProvider>
             </MainPage>
         </UserProvider>
     )
@@ -30,6 +32,7 @@ export default function MainLayout({ children, search_field = true, user_utiliti
 function MainPage({ children }) {
 
     const router = useRouter()
+    const searchParams = useSearchParams()
 
     const { user, user_dispatch } = useContext(UserContext)
 
@@ -49,13 +52,9 @@ function MainPage({ children }) {
             loading: false,
             error: '',
             success: false
-        }
+        },
+        search: ''
     })
-
-    useEffect(() => {
-        console.log(user)
-    }, [user])
-
 
     const aksi = {
         logout: async () => {
@@ -260,9 +259,32 @@ function MainPage({ children }) {
                         }
                     }))
                 }
+            },
+            set: (col, val) => {
+                setForm(state => ({
+                    ...state,
+                    [col]: val
+                }))
+            }
+        },
+        produk: {
+            search: (e) => {
+                e.preventDefault()
+
+                if(form.search !== ''){
+                    window.location.href = `/search?search=${form.search}`
+                }else{
+                    window.location.href = '/search'
+                }
             }
         }
     }
+
+    useEffect(() => {
+        if(searchParams.get('search')) {
+            aksi.form.set('search', searchParams.get('search'))
+        }
+    }, [])
 
     return (
         <div className={`w-full flex flex-col items-center justify-between min-h-screen bg-white text-zinc-700 ${poppins.className}`}>
@@ -271,12 +293,12 @@ function MainPage({ children }) {
                 {/* Navbar */}
                 <nav className="p-5 flex justify-between items-center">
                     <Logo className="w-16 h-16" href="/" />
-                    <div className="w-1/3">
+                    <form onSubmit={e => aksi.produk.search(e)} className="w-1/3">
                         <TextField
-                            fullWidth
-                        
-
+                            fullWidth 
                             size="small"
+                            value={form.search}
+                            onChange={e => aksi.form.set('search', e.target.value)}
                             placeholder="Cari produk anda disini"
                             className="placeholder:font-bold bg-zinc-100"
                             slotProps={{
@@ -286,11 +308,18 @@ function MainPage({ children }) {
                                             <Search />
                                         </InputAdornment>
                                     ),
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={() => window.location.href=`/search`}>
+                                                <Close />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
                                     
                                 }
                             }}
                         />
-                    </div>
+                    </form>
                     <div className="flex flex-row-reverse items-center gap-5">
                         {user.status === 'loading' && (
                             <CircularProgress size={20} />

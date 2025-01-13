@@ -110,6 +110,7 @@ const Kategori_Produk = db.define('Kategori_Produk', {
 
 const Kupon = db.define('Kupon', {
     ...db_column('id').int().pk().increment().build(),
+    ...db_column('code').str().notNull().build(),
     ...db_column('nama').str().notNull().default('Ini adalah Nama Kupon').build(),
     ...db_column('deskripsi').str().default('Ini adalah Deskripsi Kupon').build(),
     ...db_column('mulai').dateonly().notNull().build(),
@@ -136,6 +137,7 @@ const Payment = db.define('Payment', {
     ...db_column('id').int().pk().increment().build(),
     ...db_column('is_confirmed').bool().null().build(),
     ...db_column('fk_foto_payment').int().null().ref('Foto_Payment').build(),
+    ...db_column('fk_alamat_penerima').int().null().ref('Alamat_Penerima').build(),
     ...db_column('is_sampai').bool().null().build()
 },
     db_model_options()
@@ -147,7 +149,10 @@ const Payment = db.define('Payment', {
 const Checkout = db.define('Checkout', {
     ...db_column('id').int().pk().increment().build(),
     ...db_column('fk_kupon').int().null().ref('Kupon').build(),
-    ...db_column('fk_payment').int().null().ref('Payment').build()
+    ...db_column('fk_payment').int().null().ref('Payment').build(),
+    ...db_column('created_at').str().notNull().build(),
+    ...db_column('updated_at').str().notNull().build(),
+    ...db_column('deleted_at').str().null().build(),
 },
     db_model_options()
         .tableName('Checkout')
@@ -340,10 +345,22 @@ Payment.belongsTo(Foto_Payment, {
     onDelete: 'CASCADE'
 })
 
+Payment.hasOne(Checkout, {
+    foreignKey: 'fk_payment',
+    sourceKey: 'id',
+    onDelete: 'SET NULL'
+})
+
+Checkout.belongsTo(Payment, {
+    foreignKey: 'fk_payment',
+    targetKey: 'id',
+    onDelete: 'CASCADE'
+})
+
 Kupon.hasMany(Checkout, {
     foreignKey: 'fk_kupon',
     sourceKey: 'id',
-    onDelete: 'SET NULL'
+    onDelete: 'CASCADE'
 })
 
 Checkout.belongsTo(Kupon, {
@@ -352,7 +369,37 @@ Checkout.belongsTo(Kupon, {
     onDelete: 'CASCADE'
 })
 
+Alamat_Penerima.hasMany(Checkout, {
+    foreignKey: 'fk_alamat_penerima',
+    onDelete: 'CASCADE'
+})
 
+Checkout.belongsTo(Alamat_Penerima, {
+    foreignKey: 'fk_alamat_penerima',
+    onDelete: 'SET NULL'
+})
+
+Alamat_Penerima.hasMany(Payment, {
+    foreignKey: 'fk_alamat_penerima',
+    onDelete: 'CASCADE'
+})
+
+Payment.belongsTo(Alamat_Penerima, {
+    foreignKey: 'fk_alamat_penerima',
+    onDelete: 'SET NULL'
+})
+
+Checkout.hasMany(Keranjang, {
+    foreignKey: 'fk_checkout',
+    sourceKey: 'id',
+    onDelete: 'CASCADE'
+})
+
+Keranjang.belongsTo(Checkout, {
+    foreignKey: 'fk_checkout',
+    targetKey: 'id',
+    onDelete: 'SET NULL'
+})
 
 export { 
     Foto_Profil,
@@ -362,5 +409,12 @@ export {
     Produk,
     Foto_Produk,
     Supplier,
-    Riwayat_Supplier
+    Riwayat_Supplier,
+    Keranjang,
+    Checkout,
+    Payment,
+    Foto_Payment,
+    Favorit,
+    Alamat_Penerima,
+    Kupon
 }

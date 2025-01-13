@@ -11,13 +11,19 @@ import DropdownMenu from "./DropdownMenu"
 import { cookie_server_delete } from "@/libs/cookie_server"
 import { customToast } from "@/libs/customToast"
 import MainLayout from "./MainLayout"
+import CustomDatepickerContainer from "./CustomDatepickerContainer"
 
 export default function AdminMainLayout({ children }) {
     
     return (
         <UserProvider>
             <MainPage>
-                {children}
+                <UserProvider>
+                    <CustomDatepickerContainer>
+                        {children}
+
+                    </CustomDatepickerContainer>
+                </UserProvider>
             </MainPage>
         </UserProvider>
     )

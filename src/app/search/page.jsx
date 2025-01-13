@@ -1,15 +1,21 @@
-    'use client'
+'use client'
 
-    import CustomBreadcrumb from "@/components/CustomBreadcrumb";
-    import MainLayout from "@/components/MainLayout";
+import CustomBreadcrumb from "@/components/CustomBreadcrumb";
+import MainLayout from "@/components/MainLayout";
 import { api_get } from "@/libs/api_handler";
 import { customToast } from "@/libs/customToast";
-    import { Apps, ChevronRight, HomeOutlined, House, Search } from "@mui/icons-material";
+import { Apps, ChevronRight, HomeOutlined, House, Search } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
-    import Image from "next/image";
-    import { useEffect, useState } from "react";
+import Image from "next/image";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-    export default function SearchPage() {
+export default function SearchPage() {
+
+    const searchParams = useSearchParams()
+    const router = useRouter()
+
+    const search = searchParams.get('search')
 
     const [listData, setListData] = useState({
         products: {
@@ -20,16 +26,16 @@ import { CircularProgress } from "@mui/material";
 
     const aksi = {
         products: {
-            get_all: async () => {
+            get_all: async (searchValue) => {
                 try {
                     aksi.products.set('status', 'loading')
 
                     const response = await api_get({
-                        url: '/api/admin/data/produk'
+                        url: `/api/admin/data/produk-search?search=${searchValue || ''}`
                     })
 
                     aksi.products.set('status', 'fetched')
-                    console.log(response)
+                    
                     if(!response.success) {
                         customToast.error({
                             message: response?.message
@@ -57,26 +63,41 @@ import { CircularProgress } from "@mui/material";
     }
 
     useEffect(() => {
-        aksi.products.get_all()
+        aksi.products.get_all(
+            search
+        )
     }, [])
 
     return (
         <MainLayout>
             <div className="p-5">
                 <CustomBreadcrumb 
-                items={[
-                    {
-                        label: 'Home',
-                        icon: HomeOutlined
-                    },
-                    {
-                        label: 'Cari Produk',
-                        icon: Search
-                    },
-                    {
-                        label: '"Coca Cola"'
+                items={
+                    search
+                        ? [
+                            {
+                                label: 'Home',
+                                icon: HomeOutlined
+                            },
+                            {
+                                label: 'Cari Produk',
+                                icon: Search
+                            },
+                            {
+                                label: `"${search}"`
+                            }
+                        ]
+                        : [
+                            {
+                                label: 'Home',
+                                icon: HomeOutlined
+                            },
+                            {
+                                label: 'Cari Produk',
+                                icon: Search
+                            }
+                        ]
                     }
-                ]}
                 />
                 
                 {/* Best Seller */}
@@ -91,7 +112,7 @@ import { CircularProgress } from "@mui/material";
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
                             {listData.products.data.map(produk => (
-                                <button type="button" key={produk['id']} className="space-y-5 border border-zinc-300/0 hover:border-zinc-300 ease-out duration-100 hover:shadow-lg rounded-xl p-5 cursor-pointer">
+                                <button type="button" key={produk['id']} onClick={() => router.push(`/produk/${produk['id']}`)} className="space-y-5 border border-zinc-300/0 hover:border-zinc-300 ease-out duration-100 hover:shadow-lg rounded-xl p-5 cursor-pointer">
                                     {produk['Foto_Produk']
                                         ? (
                                             <img src={produk['Foto_Produk']['url']} className="w-full aspect-square rounded-xl object-cover object-center" alt="Foto Produk" />

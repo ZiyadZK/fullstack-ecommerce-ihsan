@@ -8,7 +8,7 @@ import { Apps, ChevronRight, HomeOutlined, House, Search } from "@mui/icons-mate
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { Suspense, use, useEffect, useState } from "react";
 
 export default function SearchPage() {
 
@@ -71,34 +71,36 @@ export default function SearchPage() {
     return (
         <MainLayout>
             <div className="p-5">
-                <CustomBreadcrumb 
-                items={
-                    search
-                        ? [
-                            {
-                                label: 'Home',
-                                icon: HomeOutlined
-                            },
-                            {
-                                label: 'Cari Produk',
-                                icon: Search
-                            },
-                            {
-                                label: `"${search}"`
-                            }
-                        ]
-                        : [
-                            {
-                                label: 'Home',
-                                icon: HomeOutlined
-                            },
-                            {
-                                label: 'Cari Produk',
-                                icon: Search
-                            }
-                        ]
-                    }
-                />
+                <Suspense fallback={<CircularProgress size={20} />}>
+                    <CustomBreadcrumb 
+                        items={
+                            search
+                                ? [
+                                    {
+                                        label: 'Home',
+                                        icon: HomeOutlined
+                                    },
+                                    {
+                                        label: 'Cari Produk',
+                                        icon: Search
+                                    },
+                                    {
+                                        label: `"${search}"`
+                                    }
+                                ]
+                                : [
+                                    {
+                                        label: 'Home',
+                                        icon: HomeOutlined
+                                    },
+                                    {
+                                        label: 'Cari Produk',
+                                        icon: Search
+                                    }
+                                ]
+                        }
+                    />
+                </Suspense>
                 
                 {/* Best Seller */}
                 <hr className="my-5 opacity-0" />

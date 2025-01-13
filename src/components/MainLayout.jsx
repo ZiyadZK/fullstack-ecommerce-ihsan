@@ -32,7 +32,7 @@ export default function MainLayout({ children, search_field = true, user_utiliti
 function MainPage({ children }) {
 
     const router = useRouter()
-    const searchParams = useSearchParams()
+    const searchParams = use(useSearchParams())
 
     const { user, user_dispatch } = useContext(UserContext)
 

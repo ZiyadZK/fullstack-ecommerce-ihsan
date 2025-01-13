@@ -1,7 +1,6 @@
 'use client'
 
 import CustomBreadcrumb from "@/components/CustomBreadcrumb"
-import CustomLoading from "@/components/CustomLoading"
 import MainLayout from "@/components/MainLayout"
 import { api_delete, api_get, api_post, api_put } from "@/libs/api_handler"
 import { customToast } from "@/libs/customToast"

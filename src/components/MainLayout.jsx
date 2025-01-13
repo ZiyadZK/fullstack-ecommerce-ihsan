@@ -3,7 +3,7 @@
 import { lexend, poppins } from "@/libs/fonts"
 import { Logo } from "./Logo"
 import DropdownMenu from "./DropdownMenu"
-import { useContext, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import { Avatar, Badge, Button, Checkbox, CircularProgress, IconButton, InputAdornment, TextField } from "@mui/material";
 import { Close, FavoriteBorderOutlined, Key, Label, Lock, Logout, People, Person, Search, ShoppingCartOutlined, Visibility, VisibilityOff, WorkspacePremiumOutlined } from "@mui/icons-material";
 import { useRouter, useSearchParams } from "next/navigation";

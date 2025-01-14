@@ -10,11 +10,11 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Suspense, use, useEffect, useState } from "react";
 
-export default function SearchPage() {
-    const pathname = usePathname()
+export default function SearchPage({ params }) {
     const router = useRouter()
+    const use_params = use(params)
 
-    const search = pathname.includes('/') ? pathname.split('/')[1] : pathname
+    const search = use_params.search
 
 
     const [listData, setListData] = useState({

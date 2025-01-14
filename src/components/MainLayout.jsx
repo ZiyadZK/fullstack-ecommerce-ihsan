@@ -32,7 +32,6 @@ export default function MainLayout({ children, search_field = true, user_utiliti
 function MainPage({ children }) {
 
     const router = useRouter()
-    const searchParams = use(useSearchParams())
 
     const { user, user_dispatch } = useContext(UserContext)
 
@@ -279,12 +278,6 @@ function MainPage({ children }) {
             }
         }
     }
-
-    useEffect(() => {
-        if(searchParams.get('search')) {
-            aksi.form.set('search', searchParams.get('search'))
-        }
-    }, [])
 
     return (
         <div className={`w-full flex flex-col items-center justify-between min-h-screen bg-white text-zinc-700 ${poppins.className}`}>

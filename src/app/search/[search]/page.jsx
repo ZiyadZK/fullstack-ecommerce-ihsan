@@ -78,14 +78,15 @@ export default function SearchPage({ params }) {
                                 ? [
                                     {
                                         label: 'Home',
-                                        icon: HomeOutlined
+                                        icon: HomeOutlined,
+                                        href: '/'
                                     },
                                     {
                                         label: 'Cari Produk',
                                         icon: Search
                                     },
                                     {
-                                        label: `"${search}"`
+                                        label: `"${decodeURIComponent(search)}"`
                                     }
                                 ]
                                 : [

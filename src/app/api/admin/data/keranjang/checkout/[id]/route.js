@@ -24,7 +24,8 @@ export async function GET(req, { params }) {
                 {
                     model: Keranjang,
                     where: {
-                        fk_user
+                        fk_user,
+                        // fk_checkout: null
                     },
                     include: [
                         {

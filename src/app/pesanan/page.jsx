@@ -6,11 +6,12 @@ import DropdownMenu from "@/components/DropdownMenu"
 import FileUploadComponent from "@/components/FileUpload"
 import MainLayout from "@/components/MainLayout"
 import Modal, { modal } from "@/components/Modal"
-import { api_get } from "@/libs/api_handler"
+import { api_get, api_post, api_post_form, api_put } from "@/libs/api_handler"
+import { client_api_post_form } from "@/libs/client_api_handler"
 import { customToast } from "@/libs/customToast"
 import { UserContext, UserProvider } from "@/provider/userProvider"
-import { CheckOutlined, HomeOutlined, MoreHoriz, Payment, PaymentOutlined, ShoppingBagOutlined, Upload } from "@mui/icons-material"
-import { LinearProgress } from "@mui/material"
+import { Check, CheckOutlined, Close, HomeOutlined, MoreHoriz, Payment, PaymentOutlined, ShoppingBagOutlined, Upload, Visibility } from "@mui/icons-material"
+import { Button, LinearProgress } from "@mui/material"
 import Link from "next/link"
 import { useContext, useEffect, useState } from "react"
 
@@ -33,7 +34,8 @@ function Page() {
             loading: {
                 upload: false,
                 cancel: false,
-                pesanan_sampai: false
+                pesanan_sampai: false,
+                update: false
             }
         }
     })
@@ -87,7 +89,7 @@ function Page() {
                     }
                 }))
             },
-            upload: async (e) => {
+            upload: async (e, id) => {
                 try {
                     aksi.payment.loading('upload')
 
@@ -99,8 +101,28 @@ function Page() {
                         return
                     }
 
+                    const payload = {
+                        id,
+                        foto: file
+                    }
+
+                    const response = await client_api_post_form({
+                        url: '/api/admin/data/payment/foto',
+                        payload
+                    })
+
                     aksi.payment.loading('upload')
-                    console.log(file)
+                    
+                    if(response.success) {
+                        customToast.success({
+                            message: 'Berhasil mengunggah bukti pembayaran'
+                        })
+                        await aksi.payment.get()
+                    }else{
+                        customToast.error({
+                            message: response?.message
+                        })
+                    }
                 } catch (error) {
                     aksi.payment.loading('upload')
                     customToast.error({
@@ -206,6 +228,39 @@ function Page() {
                 }
 
                 
+            },
+            is_sampai: async (id, is_sampai = true) => {
+                try {
+                    aksi.payment.loading('update')
+
+                    const response = await api_put({
+                        url: `/api/admin/data/payment`,
+                        payload: {
+                            id: id ? id : listData.payment.select,
+                            payload: {
+                                is_sampai
+                            }
+                        }
+                    })
+
+                    aksi.payment.loading('update')
+
+                    if(!response.success) {
+                        customToast.error({
+                            message: response.message
+                        })
+                    }else{
+                        customToast.success({
+                            message: `Berhasil mengubah status pembayaran tersebut`
+                        })
+                        await aksi.payment.get()
+                    }
+                } catch (error) {
+                    aksi.payment.loading('update')
+                    customToast.error({
+                        message: error?.message
+                    })
+                }
             }
         }
     }
@@ -225,7 +280,8 @@ function Page() {
                     items={[
                         {
                             label: 'Home',
-                            icon: HomeOutlined
+                            icon: HomeOutlined,
+                            href: '/'
                         },
                         {
                             label: 'Pesanan Saya',
@@ -337,25 +393,59 @@ function Page() {
                                             </p>
                                         </div>
                                         <div className="space-y-2">
-                                            <FileUploadComponent 
-                                                variant="contained"
-                                                fullWidth
-                                                text="Bukti pembayaran"
-                                                onChange={(e) => aksi.payment.upload(e)}
-                                            />  
-                                            <DropdownMenu 
-                                                buttonComponent={(
-                                                    <button type="button" className="w-full py-2 rounded-md text-zinc-700 hover:bg-zinc-100 border flex items-center justify-center gap-3 text-sm">
-                                                        <MoreHoriz fontSize="small" />
-                                                        Lainnya
-                                                    </button>
-                                                )}
-                                                menuItems={[
-                                                    {
-                                                        label: 'Batalkan Pesanan ini'
-                                                    }
-                                                ]}
-                                            />  
+                                            {aksi.payment.status(payment, 'string') === 'Menunggu Pembayaran' && (
+                                                <FileUploadComponent 
+                                                    variant="contained"
+                                                    fullWidth
+                                                    text="Bukti pembayaran"
+                                                    onChange={(e) => aksi.payment.upload(e, payment['id'])}
+                                                    loading={listData.payment.loading.upload}
+                                                />
+                                            )}  
+                                            {aksi.payment.status(payment, 'string') === 'Pembayaran Gagal' && (
+                                                <FileUploadComponent 
+                                                    variant="contained"
+                                                    fullWidth
+                                                    text="Bukti pembayaran"
+                                                    onChange={(e) => aksi.payment.upload(e, payment['id'])}
+                                                    loading={listData.payment.loading.upload}
+                                                />
+                                            )}  
+                                            {aksi.payment.status(payment, 'string') === 'Menunggu Konfirmasi' && (
+                                                <>
+                                                    <Modal modalId={`bukti_${payment['id']}`} title="Bukti Pembayaran Anda">
+                                                        <img src={`${payment['Foto_Payment']['url']}`} alt="Foto Bukti Pembayaran" />
+                                                    </Modal>
+                                                    <Button fullWidth onClick={() => modal.show(`bukti_${payment['id']}`)} variant="contained" startIcon={<Visibility />}>
+                                                        Lihat Bukti
+                                                    </Button>
+                                                </>
+                                            )}  
+                                            {aksi.payment.status(payment, 'string') === 'Sedang Dikirim' && (
+                                                <>
+                                                    <Button disabled={listData.payment.loading.update} fullWidth onClick={() => aksi.payment.is_sampai(payment['id'], true)} variant="contained" startIcon={<Check />}>
+                                                        Pesanan Diterima
+                                                    </Button>
+                                                    <Button disabled={listData.payment.loading.update} fullWidth color="error" onClick={() => aksi.payment.is_sampai(payment['id'], false)} variant="text" startIcon={<Close />}>
+                                                        Pesanan Tidak Diterima
+                                                    </Button>
+                                                </>
+                                            )}  
+                                            {['Menunggu Pembayaran', 'Menunggu Konfirmasi'].includes(aksi.payment.status(payment, 'string')) && (
+                                                <DropdownMenu 
+                                                    buttonComponent={(
+                                                        <button type="button" className="w-full py-2 rounded-md text-zinc-700 hover:bg-zinc-100 border flex items-center justify-center gap-3 text-sm">
+                                                            <MoreHoriz fontSize="small" />
+                                                            Lainnya
+                                                        </button>
+                                                    )}
+                                                    menuItems={[
+                                                        {
+                                                            label: 'Batalkan Pesanan ini'
+                                                        }
+                                                    ]}
+                                                />
+                                            )}  
                                         </div>  
                                     </div>
                                 </div>                

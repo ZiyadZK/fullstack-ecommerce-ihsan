@@ -259,7 +259,8 @@ function Page() {
                     items={[
                         {
                             label: 'Home',
-                            icon: HomeOutlined
+                            icon: HomeOutlined,
+                            href: '/'
                         },
                         {
                             label: 'Keranjang',

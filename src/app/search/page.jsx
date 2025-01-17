@@ -14,7 +14,7 @@ export default function SearchPage() {
     const pathname = usePathname()
     const router = useRouter()
 
-    const search = pathname.includes('/') ? pathname.split('/')[1] : pathname
+    const search = pathname.includes('/search') ? pathname.split('/search')[1] : pathname
 
 
     const [listData, setListData] = useState({
@@ -85,13 +85,17 @@ export default function SearchPage() {
                                         icon: Search
                                     },
                                     {
-                                        label: `"${search}"`
+                                        label: `${search.includes('%20')
+                                            ? search.split('%20').join(' ')
+                                            : search
+                                        }`
                                     }
                                 ]
                                 : [
                                     {
                                         label: 'Home',
-                                        icon: HomeOutlined
+                                        icon: HomeOutlined,
+                                        href: '/'
                                     },
                                     {
                                         label: 'Cari Produk',
@@ -139,9 +143,6 @@ export default function SearchPage() {
                         </div>
                     )
                 }
-
-                
-
             </div>
         </MainLayout>
     );

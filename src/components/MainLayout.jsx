@@ -271,7 +271,7 @@ function MainPage({ children }) {
                 e.preventDefault()
 
                 if(form.search !== ''){
-                    window.location.href = `/search?search=${form.search}`
+                    window.location.href = `/search/${form.search}`
                 }else{
                     window.location.href = '/search'
                 }
@@ -323,6 +323,13 @@ function MainPage({ children }) {
                             <>
                                 {user.data ? (
                                     <>
+                                        <Modal modalId="profil" title="Profile">
+                                            <div className="grid grid-cols-2 gap-5">
+                                                <div className="flex items-center justify-center">
+                                                    
+                                                </div>
+                                            </div>
+                                        </Modal>
                                         <DropdownMenu
                                             className="flex-shrink-0"
                                             buttonComponent={(
@@ -331,6 +338,7 @@ function MainPage({ children }) {
                                             menuItems={[
                                                 {
                                                     label: 'Profil',
+                                                    onClick: () => modal.show('profil')
                                                 },
                                                 {
                                                     label: 'Pesanan Anda',
@@ -621,10 +629,6 @@ function MainPage({ children }) {
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="p-5 bg-zinc-200 w-full">
-                Ini Adalah Footer
-            </div>
         </div>
     )
 }

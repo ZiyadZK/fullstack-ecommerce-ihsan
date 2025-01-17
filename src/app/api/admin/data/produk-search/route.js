@@ -9,7 +9,7 @@ export async function GET(req) {
 
         const options = {
             where: {
-
+                
             }
         }
 

@@ -67,6 +67,6 @@ export async function GET(req) {
             }
         })
     } catch (error) {
-        error_handler(error)
+        return error_handler(error)
     }
 }

@@ -1,6 +1,7 @@
 import { Alamat_Penerima, Checkout, Foto_Payment, Foto_Produk, Keranjang, Kupon, Payment, Produk } from "@/database/tables";
 import { error_handler } from "@/libs/api/error_handler";
 import { response_handler } from "@/libs/api/response_handler";
+import { Op } from "sequelize";
 
 export async function GET(req, { params }) {
     try {
@@ -13,6 +14,7 @@ export async function GET(req, { params }) {
                     include: [
                         {
                             model: Keranjang,
+                            required: true,
                             include: [
                                 {
                                     model: Produk,
@@ -42,9 +44,14 @@ export async function GET(req, { params }) {
             ]
         })
 
+        // Filter out Payments where Checkouts have no Keranjangs
+        const filteredData = data.filter(payment => 
+            payment.Checkout && payment.Checkout.Keranjangs && payment.Checkout.Keranjangs.length > 0
+        );
+
         return response_handler({ 
-            data
-        })
+            data: filteredData
+        });
     } catch (error) {
         return error_handler(error)
     }

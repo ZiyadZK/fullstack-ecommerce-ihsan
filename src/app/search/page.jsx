@@ -38,7 +38,7 @@ export default function SearchPage() {
                     
                     if(!response.success) {
                         customToast.error({
-                            message: response?.message
+                            message: response?.message || response?.error
                         })
                     }else{
                         aksi.products.set('data', response?.data)
@@ -46,7 +46,7 @@ export default function SearchPage() {
                 } catch (error) {
                     aksi.products.set('status', 'fetched')
                     customToast.error({
-                        message: error?.message
+                        message: error?.message || error?.error
                     })
                 }
             },

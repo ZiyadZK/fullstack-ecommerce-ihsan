@@ -7,6 +7,8 @@ import { customToast } from "@/libs/customToast";
 import { UserContext, UserProvider } from "@/provider/userProvider";
 import { AddShoppingCartOutlined, Apps, ChevronRight, Close, FavoriteBorderOutlined, HomeOutlined, House, Search, ShoppingBagOutlined, Star, X } from "@mui/icons-material";
 import { Avatar, CircularProgress, Rating } from "@mui/material";
+import dayjs from "dayjs";
+import id from "dayjs/locale/id";
 import Image from "next/image";
 import { use, useContext, useEffect, useState } from "react";
 
@@ -121,6 +123,15 @@ function Page({ params }) {
                         }
                     }
                 }))
+            },
+            avg_rate: (ulasans = []) => {
+                let skor = 0
+
+                ulasans.map(v => {
+                    skor += v['skor']
+                })
+
+                return skor / ulasans.length
             }
         }
     }
@@ -181,9 +192,9 @@ function Page({ params }) {
                                     </h1>
                                     <hr className="my-2 opacity-0" />
                                     <div className="flex items-center gap-5">
-                                        <Rating defaultValue={2.5} precision={0.5} readOnly />
+                                        <Rating defaultValue={aksi.products.avg_rate(listData.products.data['Ulasans'])} precision={0.5} readOnly />
                                         <p className="opacity-50">
-                                            20 Ulasan
+                                        {listData.products.data['Ulasans'].length} Ulasan
                                         </p>
                                     </div>
                                     <hr className="my-5 opacity-0" />
@@ -253,32 +264,38 @@ function Page({ params }) {
                                                 </button>
                                                 <hr className="my-2 opacity-0" />
                                                 <div className="divide-y *:py-3">
-                                                    <div className="flex items-center justify-between gap-10">
-                                                        <div className="flex gap-3">
-                                                            <Avatar className="flex-shrink-0" />
-                                                            <div className="">
-                                                                <p className="text-sm">
-                                                                    Ziyad Jahizh Kartiwa
-                                                                </p>
-                                                                <p className="text-sm opacity-80">
-                                                                    Top Markotop sih ini
-                                                                </p>
-                                                                <hr className="my-2 opacity-0" />
-                                                                <div className="flex items-center gap-5 text-xs opacity-50">
-                                                                    <p>
-                                                                        20 November 2023, 17:77
+                                                    {listData.products.data['Ulasans'].map(v => (
+                                                        <div key={v['id']} className="flex items-center justify-between gap-10">
+                                                            <div className="flex gap-3">
+                                                                <Avatar 
+                                                                    src={
+                                                                        v['User']['Foto_Profil']
+                                                                            ? v['User']['Foto_Profil']['url']
+                                                                            : ''
+                                                                    } 
+                                                                    className="flex-shrink-0" 
+                                                                />
+                                                                <div className="">
+                                                                    <p className="text-sm">
+                                                                        {v['User']['nama']}
                                                                     </p>
-                                                                    <p>
-                                                                        2 Botol
+                                                                    <p className="text-sm opacity-80">
+                                                                        {v['deskripsi']}
                                                                     </p>
+                                                                    <hr className="my-2 opacity-0" />
+                                                                    <div className="flex items-center gap-5 text-xs opacity-50">
+                                                                        <p>
+                                                                            {dayjs(v['created_at']).locale(id).format('dddd, DD MMMM YYYY, HH:mm:ss')}
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
                                                             </div>
+                                                            <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                                                                <Star fontSize="small" className="text-amber-500" />
+                                                                {v['skor']}
+                                                            </div>
                                                         </div>
-                                                        <div className="flex flex-col items-center gap-2 flex-shrink-0">
-                                                            <Star fontSize="small" className="text-amber-500" />
-                                                            4.5
-                                                        </div>
-                                                    </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         )

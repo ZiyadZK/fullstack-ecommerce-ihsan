@@ -1,4 +1,4 @@
-import { Alamat_Penerima, Checkout, Foto_Payment, Foto_Produk, Keranjang, Kupon, Payment, Produk } from "@/database/tables";
+import { Alamat_Penerima, Checkout, Foto_Payment, Foto_Produk, Keranjang, Kupon, Payment, Produk, Ulasan } from "@/database/tables";
 import { error_handler } from "@/libs/api/error_handler";
 import { response_handler } from "@/libs/api/response_handler";
 import { Op } from "sequelize";
@@ -24,11 +24,13 @@ export async function GET(req, { params }) {
                                         }
                                     ]
                                 },
-                                
+                                {
+                                    model: Ulasan
+                                }
                             ],
                             where: {
                                 fk_user
-                            }
+                            },
                         },
                         {
                             model: Kupon

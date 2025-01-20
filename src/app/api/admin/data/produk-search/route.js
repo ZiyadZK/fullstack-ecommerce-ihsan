@@ -1,4 +1,4 @@
-import { Foto_Produk, Produk } from "@/database/tables";
+import { Foto_Produk, Foto_Profil, Produk, Ulasan, User } from "@/database/tables";
 import { error_handler } from "@/libs/api/error_handler";
 import { response_handler } from "@/libs/api/response_handler";
 import { Op } from "sequelize";
@@ -26,6 +26,19 @@ export async function GET(req) {
             include: [
                 {
                     model: Foto_Produk
+                },
+                {
+                    model: Ulasan,
+                    include: [
+                        {
+                            model: User,
+                            include: [
+                                {
+                                    model: Foto_Profil
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         })

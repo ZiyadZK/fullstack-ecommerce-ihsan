@@ -10,8 +10,8 @@ import { api_get, api_post, api_post_form, api_put } from "@/libs/api_handler"
 import { client_api_post_form } from "@/libs/client_api_handler"
 import { customToast } from "@/libs/customToast"
 import { UserContext, UserProvider } from "@/provider/userProvider"
-import { Check, CheckOutlined, Close, HomeOutlined, MoreHoriz, Payment, PaymentOutlined, ShoppingBagOutlined, Upload, Visibility } from "@mui/icons-material"
-import { Button, LinearProgress } from "@mui/material"
+import { Add, Check, CheckOutlined, Close, HomeOutlined, MoreHoriz, Payment, PaymentOutlined, ShoppingBagOutlined, Star, Upload, Visibility } from "@mui/icons-material"
+import { Button, LinearProgress, Rating, TextField } from "@mui/material"
 import Link from "next/link"
 import { useContext, useEffect, useState } from "react"
 
@@ -37,6 +37,11 @@ function Page() {
                 pesanan_sampai: false,
                 update: false
             }
+        },
+        rate: {
+            value: 0,
+            loading: false,
+            deskripsi: ''
         }
     })
 
@@ -261,6 +266,97 @@ function Page() {
                         message: error?.message
                     })
                 }
+            },
+            rate: {
+                init: (modalId, value) => {
+                    setListData(state => ({
+                        ...state,
+                        rate: {
+                            ...state.rate,
+                            value
+                        }
+                    }))
+
+                    modal.show(modalId)
+                },
+                clear: () => {
+                    setListData(state => ({
+                        ...state,
+                        rate: {
+                            ...state.rate,
+                            value: 0,
+                            deskripsi: '',
+                            loading: false
+                        }
+                    }))
+                },
+                submit: async (e, modalId, id_keranjang, fk_produk) => {
+                    try {
+                        e.preventDefault()
+
+                        setListData(state => ({
+                            ...state,
+                            rate: {
+                                ...state.rate,
+                                loading: !state.rate.loading
+                            }
+                        }))
+
+                        const response = await api_post({
+                            url: '/api/admin/data/ulasan',
+                            payload: {
+                                id_keranjang,
+                                payload: {
+                                    skor: listData.rate.value,
+                                    deskripsi: listData.rate.deskripsi,
+                                    fk_user: user.data.id,
+                                    fk_produk
+                                }
+                            }
+                        })
+
+                        setListData(state => ({
+                            ...state,
+                            rate: {
+                                ...state.rate,
+                                loading: !state.rate.loading
+                            }
+                        }))
+
+                        modal.close(modalId)
+                        if(response.success) {
+                            aksi.payment.rate.clear()
+                            customToast.success({
+                                message: 'Berhasil memberikan ulasan'
+                            })
+                            aksi.payment.get()
+                        }else{
+                            customToast.error({
+                                message: response?.message
+                            })
+                        }
+                    } catch (error) {
+                        setListData(state => ({
+                            ...state,
+                            rate: {
+                                ...state.rate,
+                                loading: !state.rate.loading
+                            }
+                        }))
+                        customToast.error({
+                            message: error?.message
+                        })
+                    }
+                },
+                set: (col, val) => {
+                    setListData(state => ({
+                        ...state,
+                        rate: {
+                            ...state.rate,
+                            [col]: val
+                        }
+                    }))
+                }
             }
         }
     }
@@ -309,46 +405,135 @@ function Page() {
                             </div>
                         )}>
                             <div className="grid grid-cols-12 gap-5 py-2 border-b">
-                                <div className="col-span-6 flex items-center gap-3">
-                                    <p className="font-medium text-sm opacity-50">
-                                        PRODUK
-                                    </p>
-                                </div>
-                                <div className="col-span-3 flex items-center gap-3">
-                                    <p className="font-medium text-sm opacity-50">
-                                        JUMLAH
-                                    </p>
-                                </div>
-                                <div className="col-span-3 flex items-center gap-3 justify-end">
-                                    <p className="font-medium text-sm opacity-50">
-                                        HARGA
-                                    </p>
-                                </div>
+                                {aksi.payment.status(payment, 'string') === 'Pesanan Diterima'
+                                    ? (
+                                        <>
+                                            <div className="col-span-5 flex items-center gap-3">
+                                                <p className="font-medium text-sm opacity-50">
+                                                    PRODUK
+                                                </p>
+                                            </div>
+                                            <div className="col-span-2 flex items-center gap-3">
+                                                <p className="font-medium text-sm opacity-50">
+                                                    JUMLAH
+                                                </p>
+                                            </div>
+                                            <div className="col-span-2 flex items-center gap-3 justify-end">
+                                                <p className="font-medium text-sm opacity-50">
+                                                    HARGA
+                                                </p>
+                                            </div>
+                                            <div className="col-span-3 flex items-center gap-3 justify-end">
+                                                <p className="font-medium text-sm opacity-50">
+                                                    NILAI
+                                                </p>
+                                            </div>
+                                        </>
+                                    )
+                                    : (
+                                        <>
+                                            <div className="col-span-6 flex items-center gap-3">
+                                                <p className="font-medium text-sm opacity-50">
+                                                    PRODUK
+                                                </p>
+                                            </div>
+                                            <div className="col-span-3 flex items-center gap-3">
+                                                <p className="font-medium text-sm opacity-50">
+                                                    JUMLAH
+                                                </p>
+                                            </div>
+                                            <div className="col-span-3 flex items-center gap-3 justify-end">
+                                                <p className="font-medium text-sm opacity-50">
+                                                    HARGA
+                                                </p>
+                                            </div>
+                                        </>
+                                    )
+                                }
                             </div>
                             <div className="divide-y *:py-2">
 
                                 {payment['Checkout']['Keranjangs'].map(keranjang => (
                                     <div key={keranjang['id']} className="grid grid-cols-12 gap-5">
-                                        <div className="col-span-6 flex items-center gap-3">
-                                            {keranjang['Produk']['Foto_Produk']
-                                                ?   <img className="w-10 object-cover object-center rounded-xl aspect-square" src={keranjang['Produk']['Foto_Produk']['url']} alt="Logo produk" />    
-                                                : <div className="w-10 rounded-xl aspect-square bg-zinc-200"></div>
-                                            }
-                                            
-                                            <Link href={`/produk/${keranjang['fk_produk']}`} className="text-sm font-medium tracking-tighter underline hover:text-blue-500 hover:decoration-blue-500">
-                                                {keranjang['Produk']['nama']}
-                                            </Link>
-                                        </div>    
-                                        <div className="col-span-3 flex items-center gap-3">
-                                            <p className=" opacity-50 text-sm">
-                                                {keranjang['jumlah']} {keranjang['Produk']['satuan']}
-                                            </p>
-                                        </div>    
-                                        <div className="col-span-3 flex items-center justify-end gap-3">
-                                            <p className=" font-medium tracking-tighter text-sm">
-                                                Rp {aksi.payment.total.produk.harga(keranjang['jumlah'], keranjang['Produk']['harga_per_satuan'])}
-                                            </p>
-                                        </div>  
+                                        {aksi.payment.status(payment, 'string') === 'Pesanan Diterima'
+                                            ? (
+                                                <>
+                                                    <div className="col-span-5 flex items-center gap-3">
+                                                        {keranjang['Produk']['Foto_Produk']
+                                                            ?   <img className="w-10 object-cover object-center rounded-xl aspect-square" src={keranjang['Produk']['Foto_Produk']['url']} alt="Logo produk" />    
+                                                            : <div className="w-10 rounded-xl aspect-square bg-zinc-200"></div>
+                                                        }
+                                                        
+                                                        <Link href={`/produk/${keranjang['fk_produk']}`} className="text-sm font-medium tracking-tighter underline hover:text-blue-500 hover:decoration-blue-500">
+                                                            {keranjang['Produk']['nama']}
+                                                        </Link>
+                                                    </div>    
+                                                    <div className="col-span-2 flex items-center gap-3">
+                                                        <p className=" opacity-50 text-sm">
+                                                            {keranjang['jumlah']} {keranjang['Produk']['satuan']}
+                                                        </p>
+                                                    </div>    
+                                                    <div className="col-span-2 flex items-center justify-end gap-3">
+                                                        <p className=" font-medium tracking-tighter text-sm">
+                                                            Rp {aksi.payment.total.produk.harga(keranjang['jumlah'], keranjang['Produk']['harga_per_satuan'])}
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-span-3 flex items-center justify-end gap-3">
+                                                        {keranjang['Ulasan']
+                                                            ? <Rating value={keranjang['Ulasan']['skor']} precision={0.5} readOnly />
+                                                            : (
+                                                                <>
+                                                                    <Rating 
+                                                                        precision={0.5}
+                                                                        onChange={(e, value) => aksi.payment.rate.init(keranjang['id'], value)}
+                                                                    />
+                                                                    <Modal modalId={keranjang['id']} title="Berikan Ulasan" onClose={() => aksi.payment.rate.clear()}>
+                                                                        <form onSubmit={(e) => aksi.payment.rate.submit(e, keranjang['id'], keranjang['id'], keranjang['Produk']['id'])} className="space-y-2">
+                                                                            <TextField 
+                                                                                fullWidth
+                                                                                size="small"
+                                                                                placeholder="Berikan ulasan anda disini"
+                                                                                disabled={listData.rate.loading}
+                                                                                required
+                                                                                value={listData.rate.deskripsi}
+                                                                                onChange={(e) => aksi.payment.rate.set('deskripsi', e.target.value)}
+                                                                            />
+                                                                            <Button disabled={listData.rate.loading} type="submit" fullWidth variant="contained">
+                                                                                Simpan
+                                                                            </Button>
+                                                                        </form>
+                                                                    </Modal>
+                                                                </>
+                                                            )
+                                                        }
+                                                    </div>  
+                                                </>
+                                            )
+                                            : (
+                                                <>
+                                                    <div className="col-span-6 flex items-center gap-3">
+                                                        {keranjang['Produk']['Foto_Produk']
+                                                            ?   <img className="w-10 object-cover object-center rounded-xl aspect-square" src={keranjang['Produk']['Foto_Produk']['url']} alt="Logo produk" />    
+                                                            : <div className="w-10 rounded-xl aspect-square bg-zinc-200"></div>
+                                                        }
+                                                        
+                                                        <Link href={`/produk/${keranjang['fk_produk']}`} className="text-sm font-medium tracking-tighter underline hover:text-blue-500 hover:decoration-blue-500">
+                                                            {keranjang['Produk']['nama']}
+                                                        </Link>
+                                                    </div>    
+                                                    <div className="col-span-3 flex items-center gap-3">
+                                                        <p className=" opacity-50 text-sm">
+                                                            {keranjang['jumlah']} {keranjang['Produk']['satuan']}
+                                                        </p>
+                                                    </div>    
+                                                    <div className="col-span-3 flex items-center justify-end gap-3">
+                                                        <p className=" font-medium tracking-tighter text-sm">
+                                                            Rp {aksi.payment.total.produk.harga(keranjang['jumlah'], keranjang['Produk']['harga_per_satuan'])}
+                                                        </p>
+                                                    </div>  
+                                                </>
+                                            )
+                                        }
                                         
                                     </div>
                                 ))}           

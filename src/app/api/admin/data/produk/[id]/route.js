@@ -1,4 +1,4 @@
-import { Foto_Produk, Kategori, Kategori_Produk, Produk } from "@/database/tables";
+import { Foto_Produk, Foto_Profil, Kategori, Kategori_Produk, Produk, Ulasan, User } from "@/database/tables";
 import { error_handler } from "@/libs/api/error_handler";
 import { response_handler } from "@/libs/api/response_handler";
 
@@ -20,6 +20,19 @@ export async function GET(req, { params }) {
                     include: [
                         {
                             model: Kategori
+                        }
+                    ]
+                },
+                {
+                    model: Ulasan,
+                    include: [
+                        {
+                            model: User,
+                            include: [
+                                {
+                                    model: Foto_Profil
+                                }
+                            ]
                         }
                     ]
                 }

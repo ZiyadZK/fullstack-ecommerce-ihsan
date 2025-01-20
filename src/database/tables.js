@@ -165,7 +165,8 @@ const Keranjang = db.define('Keranjang', {
     ...db_column('fk_produk').int().notNull().ref('Produk').build(),
     ...db_column('fk_user').int().notNull().ref('User').build(),
     ...db_column('jumlah').int().notNull().default(1).build(),
-    ...db_column('fk_checkout').int().null().ref('Checkout').build()
+    ...db_column('fk_checkout').int().null().ref('Checkout').build(),
+    ...db_column('fk_ulasan').int().null().ref('Ulasan').build()
 },
     db_model_options()
         .tableName('Keranjang')
@@ -204,6 +205,20 @@ const Riwayat_Supplier = db.define('Riwayat_Supplier', {
 },
     db_model_options()
         .tableName('Riwayat_Supplier')
+        .timestamps(false)
+        .build()
+)
+
+const Ulasan = db.define('Ulasan', {
+    ...db_column('id').int().pk().increment().build(),
+    ...db_column('fk_user').int().notNull().ref('User').build(),
+    ...db_column('fk_produk').int().null().ref('Produk').build(),
+    ...db_column('skor').float().notNull().default(1).build(),
+    ...db_column('deskripsi').str().null().build(),
+    ...db_column('created_at').str().null().build()
+},
+    db_model_options()
+        .tableName('Ulasan')
         .timestamps(false)
         .build()
 )
@@ -278,10 +293,26 @@ Keranjang.belongsTo(Produk, {
     targetKey: 'id'
 })
 
+Produk.hasMany(Ulasan, {
+    foreignKey: 'fk_produk'
+})
+
+Ulasan.belongsTo(Produk, {
+    foreignKey: 'fk_produk'
+})
+
 User.hasMany(Keranjang, {
     foreignKey: 'fk_user',
     sourceKey: 'id',
     onDelete: 'CASCADE'
+})
+
+Ulasan.hasMany(Keranjang, {
+    foreignKey: 'fk_ulasan'
+})
+
+Keranjang.belongsTo(Ulasan, {
+    foreignKey: 'fk_ulasan'
 })
 
 Keranjang.belongsTo(User, {
@@ -401,6 +432,14 @@ Keranjang.belongsTo(Checkout, {
     onDelete: 'SET NULL'
 })
 
+User.hasMany(Ulasan, {
+    foreignKey: 'fk_user'
+})
+
+Ulasan.belongsTo(User, {
+    foreignKey: 'fk_user'
+})
+
 export { 
     Foto_Profil,
     User,
@@ -416,5 +455,6 @@ export {
     Foto_Payment,
     Favorit,
     Alamat_Penerima,
-    Kupon
+    Kupon,
+    Ulasan
 }

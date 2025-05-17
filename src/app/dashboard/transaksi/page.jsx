@@ -415,7 +415,7 @@ export default function DashboardTransaksiPage() {
                     {
                         field: 'nama',
                         headerName: 'Penerima',
-                        valueGetter: (value, row) => `${row['Alamat_Penerima']['nama']}`
+                        valueGetter: (value, row) => `${row['Alamat_Penerima']?.nama}`
                     },
                     {
                         field: 'nama3',

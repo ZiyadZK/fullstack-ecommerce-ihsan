@@ -468,14 +468,14 @@ function Page() {
                                                     <div className="py-2">
                                                         <div className="flex items-center gap-5">
                                                             <p>
-                                                                {alamat['nama']}
+                                                                {alamat?.nama}
                                                             </p>
                                                             <p>
-                                                                {alamat['no_hp']}
+                                                                {alamat?.no_hp}
                                                             </p>
                                                         </div>
                                                         <p className="text-sm opacity-50 font-normal">
-                                                            {alamat['alamat']}
+                                                            {alamat?.alamat}
                                                         </p>
                                                     </div>
                                                 </div>

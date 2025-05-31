@@ -396,7 +396,7 @@ function Page() {
                                         #{payment['id']}
                                     </p>
                                     <p className="text-sm truncate">
-                                        {payment['Alamat_Penerima']['nama']}
+                                        {payment['Alamat_Penerima']?.nama}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-5">
@@ -465,7 +465,7 @@ function Page() {
                                                         }
                                                         
                                                         <Link href={`/produk/${keranjang['fk_produk']}`} className="text-sm font-medium tracking-tighter underline hover:text-blue-500 hover:decoration-blue-500">
-                                                            {keranjang['Produk']['nama']}
+                                                            {keranjang['Produk']?.nama}
                                                         </Link>
                                                     </div>    
                                                     <div className="col-span-2 flex items-center gap-3">
@@ -518,7 +518,7 @@ function Page() {
                                                         }
                                                         
                                                         <Link href={`/produk/${keranjang['fk_produk']}`} className="text-sm font-medium tracking-tighter underline hover:text-blue-500 hover:decoration-blue-500">
-                                                            {keranjang['Produk']['nama']}
+                                                            {keranjang['Produk']?.nama}
                                                         </Link>
                                                     </div>    
                                                     <div className="col-span-3 flex items-center gap-3">
@@ -544,10 +544,10 @@ function Page() {
                                             Informasi Penerima
                                         </h1>
                                         <div className="opacity-50">
-                                            {payment['Alamat_Penerima']['nama']} ({payment['Alamat_Penerima']['no_hp']})
+                                            {payment['Alamat_Penerima']?.nama} ({payment['Alamat_Penerima']?.no_hp})
                                         </div>
                                         <div className="opacity-50 text-justify">
-                                        {payment['Alamat_Penerima']['alamat']}
+                                        {payment['Alamat_Penerima']?.alamat}
                                         </div>
                                     </div>
                                     <div className="w-1/5 space-y-1">
